@@ -1,5 +1,5 @@
-#include"ChessBoard.h"
-#include<iostream>
+#include "ChessBoard.h"
+#include <iostream>
 
 using std::cout;
 
@@ -14,13 +14,13 @@ int main() {
 
 	cb.display_board();
 
-	/*
+	
 	cb.submitMove("D7", "D6");
 	cout << '\n';
 
 	cb.submitMove("D4", "H6");
 	cout << '\n';
-
+	/*
 	cb.submitMove("D2", "D4");
 	cout << '\n';
 
