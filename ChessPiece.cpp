@@ -73,50 +73,57 @@ bool ChessPiece::move_piece(const int up, const int down, const char source[2]){
 
 // attempt to make a move from source to destination
 bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return true;
+  return false;
 }
 
 // attempt to make a move from source to destination
 bool Rook::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return true;
+  return false;
 }
 
 // attempt to make a move from source to destination
 bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return true;
+  return false;
 }
 
 // attempt to make a move from source to destination
 bool Queen::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return true;
+  return false;
 }
 
 // attempt to make a move from source to destination
 bool Knight::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return true;
+  return false;
 }
 
 
 // attempt to make a move from source to destination
-bool Pawn::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destination[2]){
 
   // obtain column and row
-  int col = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-  int row = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
+  
   // Set direction to -1 if black
   int vertDir = 1;
-  (this->getColour())? vertDir = -1 : vertDir = 1;
-  /*
+  (colour)? vertDir = -1 : vertDir = 1;
+  
   // allow for advancing two squares at the start if it is at start position
-  if ( ( row == 1 && this->getColour() == false ) || ( row == 6 && this->getColour() == true ) ) {
+  if ( (!cb.board[srow+vertDir][scol]) && ((srow == 1 && colour == false ) || ( srow == 6 && colour == true ))) {
+    if ( (srow + 2*vertDir) == drow && scol == dcol ){
+      row = drow;
+      col = dcol;
+      return true;
+    }
+  }
 
-    if ( cb.board[start   
-    
-    }*/
+  // allow for diagonal movement
+  
 
   
-  return true;
+  return false;
 }
 
 

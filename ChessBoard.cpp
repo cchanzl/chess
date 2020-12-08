@@ -131,7 +131,11 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     std::cout << print_colour(turn) << "'s " <<  board[drow][dcol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
   }
   else if ( board[srow][scol]->is_valid(*this, source, destination) ){
-    std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1] << std::endl;
+    board[drow][dcol] = board[srow][scol];
+    board[srow][scol] = nullptr;
+    std::cout << print_colour(turn) <<"'s " << board[drow][dcol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1] << std::endl;
+
+    display_board();
   }
   
   change_turn();

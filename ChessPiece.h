@@ -16,6 +16,7 @@ class ChessBoard;
 
 // this is an abstract class
 class ChessPiece {
+protected:
   std::string shortName;
   std::string longName;
   bool status;       // true if alive
@@ -32,7 +33,7 @@ public:
   ChessPiece(const std::string longName, const bool colour, int row, int col);
 
   // pure virtual function
-  virtual bool is_valid(ChessBoard cb, const char source[2], const char destination[2]) = 0;  
+  virtual bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) = 0;  
   
   std::string getShortName(){return shortName;};
   std::string getLongName(){return longName;};
@@ -111,7 +112,7 @@ public:
     :ChessPiece("Pawn", colour2, row, col) {};
   
   // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb,const char source[2], const char destination[2]); 
+  bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) override; 
  
 
 };
