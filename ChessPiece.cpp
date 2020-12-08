@@ -61,28 +61,16 @@ bool ChessPiece::is_diag_valid(ChessBoard cb, const char source[2], const char d
   int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
 
-  int count = 1;
-  int r_direction;
-  int c_direction;    
+  int count = 0;
+  // {row, col}
+  int direction[4][2] = {{ 1, 1}, {-1, 1},
+			 { 1,-1}, {-1,-1}};
   
   // move one cell by one cell along the 'X' diagonal
-  while ( count <= 4 ){
-
-    if ( count == 1 ){
-      r_direction = 1; // move north-east
-      c_direction = 1;  
-    }
-    else if ( count == 2 ){
-      r_direction = -1; // move south-east
-      c_direction = 1;  
-    }
-    else if ( count == 3 ){
-      r_direction = 1; // move north-west
-      c_direction = -1;  
-    } else {
-      r_direction = -1; // move south-west
-      c_direction = -1;  
-    }
+  while ( count < 4 ){
+    int r_direction = direction[count][0];
+    int c_direction = direction[count][1];
+    
     
     for ( int i = 1; i < BOARD_LEN; i++){
      
@@ -108,7 +96,6 @@ bool ChessPiece::is_diag_valid(ChessBoard cb, const char source[2], const char d
 	col = dcol;
 	return true;
       }
-
     }
     count++;
   }
@@ -125,28 +112,16 @@ bool ChessPiece::is_line_valid(ChessBoard cb, const char source[2], const char d
   int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
 
-  int count = 1;
-  int r_direction;
-  int c_direction;    
-  
-  // move one cell by one cell along the 'X' diagonal
-  while ( count <= 4 ){
+  int count = 0;
+  // {row, col}
+  int direction[4][2] = {{ 0, 1}, { 0,-1},
+			 { 1, 0}, {-1, 0}};
 
-    if ( count == 1 ){
-      r_direction = 0; // move north 
-      c_direction = 1;  
-    }
-    else if ( count == 2 ){
-      r_direction = 0; // move south
-      c_direction = -1;  
-    }
-    else if ( count == 3 ){
-      r_direction = 1;  // move east
-      c_direction = 0;  
-    } else {
-      r_direction = -1; // move west
-      c_direction = 0;  
-    }
+  // move one cell by one cell along the 'X' diagonal
+  while ( count < 4 ){
+
+    int r_direction = direction[count][0];
+    int c_direction = direction[count][1];
     
     for ( int i = 1; i < BOARD_LEN; i++){
      
@@ -172,19 +147,17 @@ bool ChessPiece::is_line_valid(ChessBoard cb, const char source[2], const char d
 	col = dcol;
 	return true;
       }
-
     }
     count++;
   }
-  
   return false;
 }
 
 
-//================= Inidivudal pieces member Functions =====================
+//================= Member Functions of individual pieces =====================
 
 // attempt to make a move from source to destination
-bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool Queen::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
   // check if there is any valid diagonal("X") / linear("+") move
   if ( is_diag_valid(cb, source, destination )) return true;
   if ( is_line_valid(cb, source, destination )) return true;
@@ -204,12 +177,98 @@ bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destinatio
 }
 
 // attempt to make a move from source to destination
-bool Queen::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+ 
+  // obtain column and row
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
+
+  // {row, col}
+  int direction[8][2] = {{ 1, 0}, { 1, 1},
+			 { 1,-1}, { 0, 1},
+			 { 0,-1}, {-1,-1},
+			 {-1, 0}, {-1, 1}};
+
+  for ( int i = 0; i < BOARD_LEN; i++){  
+    // initialise direction
+    int r_direction = direction[i][0];
+    int c_direction = direction[i][1];
+
+    // Condition 1: Move must be within the board
+    if( !is_within_board(r_direction, c_direction, source) ) {
+      std::cout << "Not within board" << std::endl;
+      continue;
+    }
+    
+    // Condition 2: Check if there is a piece in destination
+    if ( cb.board[srow + r_direction][scol + c_direction] ){
+      // Condition 2.1: If a piece is in destination, it must not be same colour
+      if ( cb.board[srow + r_direction][scol + c_direction]->getColour() == colour) continue;
+      // Condition 2.2: If next piece is opposite colour, check if it is destination
+      if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+	row = drow;
+	col = dcol;
+	return true;
+      }
+    }
+
+    // Condition 3: Move must have the same position as destination after move
+    if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+      row = drow;
+      col = dcol;
+      return true;
+    }
+  }
   return false;
 }
 
 // attempt to make a move from source to destination
 bool Knight::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+  
+  // obtain column and row
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
+
+  // {row, col}
+  int direction[8][2] = {{ 2, 1}, { 2,-1},
+			 { 1, 2}, { 1,-2},
+			 {-2, 1}, {-2,-1},
+			 {-1, 2}, {-1,-2}};
+
+  for ( int i = 0; i < BOARD_LEN; i++){  
+    // initialise direction
+    int r_direction = direction[i][0];
+    int c_direction = direction[i][1];
+
+    // Condition 1: Move must be within the board
+    if( !is_within_board(r_direction, c_direction, source) ) {
+      std::cout << "Not within board" << std::endl;
+      continue;
+    }
+    
+    // Condition 2: Check if there is a piece in destination
+    if ( cb.board[srow + r_direction][scol + c_direction] ){
+      // Condition 2.1: If a piece is in destination, it must not be same colour
+      if ( cb.board[srow + r_direction][scol + c_direction]->getColour() == colour) continue;
+      // Condition 2.2: If next piece is opposite colour, check if it is destination
+      if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+	row = drow;
+	col = dcol;
+	return true;
+      }
+    }
+
+    // Condition 3: Move must have the same position as destination after move
+    if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+      row = drow;
+      col = dcol;
+      return true;
+    }
+  }
   return false;
 }
 

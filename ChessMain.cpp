@@ -50,7 +50,10 @@ int main() {
 
 	cb.submitMove("F6", "F3"); // to be deleted
 	cout << '\n';
-	
+
+	cb.submitMove("E1", "E2"); // to be deleted
+	cout << '\n';
+
 	
 	/*
 	cb.submitMove("F8", "B4");

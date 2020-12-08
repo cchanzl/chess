@@ -107,12 +107,12 @@ void ChessBoard::resetBoard(){
       }
 
       // Initialise king
-      else if ( index == 3 || index == 59){ 
+      else if ( index == 4 || index == 60){ 
 	board[row][col] = new King(colour, row, col);
       }
 
       // Initialise queen
-      else if ( index == 4 || index == 60){ 
+      else if ( index == 3 || index == 59){ 
 	board[row][col] = new Queen(colour, row, col);
       }
 
