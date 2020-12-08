@@ -148,7 +148,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   
   // check if destination is occupied by the same colour as start
   else if ( board[drow][dcol] && board[drow][dcol]->getColour() == board[srow][scol]->getColour() ){
-    std::cout << print_colour(turn) << "'s " <<  board[drow][dcol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
+    std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
   }
 
   // check if it is a valid move

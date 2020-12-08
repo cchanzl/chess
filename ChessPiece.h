@@ -27,8 +27,12 @@ protected:
   // returns true if move is within board
   bool is_within_board(const int row, const int col, const char source[2]);
 
-  // makes diagonal moves
+  // returns true if source can move to destination diagonally ("X")
   bool is_diag_valid(ChessBoard cb, const char source[2], const char destination[2]);
+
+  // returns true if source can move to destination linearly ("+")
+  bool is_line_valid(ChessBoard cb, const char source[2], const char destination[2]);
+
   
 public:
   ChessPiece(){};

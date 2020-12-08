@@ -47,13 +47,12 @@ bool ChessPiece::is_within_board(const int row, const int col, const char source
 
   // check final position is within board
   if( srow+row < 0 || srow+row > BOARD_LEN-1 || scol+col < 0 || scol+col > BOARD_LEN-1 ){
-    std::cerr << "Movement must be between 1 and 7 (inclusive)." << std::endl;
     return false;
   }
   return true;
 }
 
-// makes diagonal moves
+// returns true if source can move to destination diagonally ("X")
 bool ChessPiece::is_diag_valid(ChessBoard cb, const char source[2], const char destination[2]){;
 
   // obtain column and row
@@ -63,25 +62,25 @@ bool ChessPiece::is_diag_valid(ChessBoard cb, const char source[2], const char d
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
 
   int count = 1;
-  int r_direction = 1;
-  int c_direction = 1;    
+  int r_direction;
+  int c_direction;    
   
   // move one cell by one cell along the 'X' diagonal
   while ( count <= 4 ){
 
     if ( count == 1 ){
-      r_direction = 1;
+      r_direction = 1; // move north-east
       c_direction = 1;  
     }
     else if ( count == 2 ){
-      r_direction = -1;
+      r_direction = -1; // move south-east
       c_direction = 1;  
     }
     else if ( count == 3 ){
-      r_direction = 1;
+      r_direction = 1; // move north-west
       c_direction = -1;  
     } else {
-      r_direction = -1;
+      r_direction = -1; // move south-west
       c_direction = -1;  
     }
     
@@ -117,25 +116,91 @@ bool ChessPiece::is_diag_valid(ChessBoard cb, const char source[2], const char d
   return false;
 }
 
+// returns true if source can move to destination linearly ("+")
+bool ChessPiece::is_line_valid(ChessBoard cb, const char source[2], const char destination[2]){;
+
+  // obtain column and row
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
+
+  int count = 1;
+  int r_direction;
+  int c_direction;    
+  
+  // move one cell by one cell along the 'X' diagonal
+  while ( count <= 4 ){
+
+    if ( count == 1 ){
+      r_direction = 0; // move north 
+      c_direction = 1;  
+    }
+    else if ( count == 2 ){
+      r_direction = 0; // move south
+      c_direction = -1;  
+    }
+    else if ( count == 3 ){
+      r_direction = 1;  // move east
+      c_direction = 0;  
+    } else {
+      r_direction = -1; // move west
+      c_direction = 0;  
+    }
+    
+    for ( int i = 1; i < BOARD_LEN; i++){
+     
+      // Condition 1: Move must be within the board
+      if( !is_within_board(i*r_direction, i*c_direction, source) ) break;
+      
+      // Condition 2: Check if there is a piece in next move
+      if ( cb.board[srow + i*r_direction][scol + i*c_direction] ){
+	// Condition 2.1: If a piece is in next move, it must not be same colour
+	if ( cb.board[srow + i*r_direction][scol + i*c_direction]->getColour() == colour) break;
+	// Condition 2.2: If next piece is opposite colour, check if it is destination
+	if ( srow + i*r_direction == drow && scol + i*c_direction == dcol ){    
+	  row = drow;
+	  col = dcol;
+	  return true;
+	}
+	break;
+      }
+    
+      // Condition 3: Move must have the same position as destination after move
+      if ( srow + i*r_direction == drow && scol + i*c_direction == dcol ){    
+	row = drow;
+	col = dcol;
+	return true;
+      }
+
+    }
+    count++;
+  }
+  
+  return false;
+}
+
+
 //================= Inidivudal pieces member Functions =====================
 
 // attempt to make a move from source to destination
 bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+  // check if there is any valid diagonal("X") / linear("+") move
+  if ( is_diag_valid(cb, source, destination )) return true;
+  if ( is_line_valid(cb, source, destination )) return true;
   return false;
 }
 
 // attempt to make a move from source to destination
 bool Rook::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return false;
+  // check if there is any valid linear move ("+")
+  return is_line_valid(cb, source, destination);
 }
 
 // attempt to make a move from source to destination
 bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-
-  // check moves in digonal
+  // check if there is any valid diagonal move ("X")
   return is_diag_valid(cb, source, destination);
-
-  return false;
 }
 
 // attempt to make a move from source to destination
