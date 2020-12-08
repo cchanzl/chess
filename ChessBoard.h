@@ -13,7 +13,6 @@
 #include "ChessPiece.h"
 
 class ChessBoard{
-  ChessPiece** board = new ChessPiece* [BOARD_LEN*BOARD_LEN-1];
   bool turn = false; // white moves first
   /*  
   bool is_stale(); // returns true if it is a stalemate
@@ -26,8 +25,10 @@ class ChessBoard{
   void change_turn();
     
  public:
-  ChessBoard(){resetBoard();};
+  ChessPiece* board[BOARD_LEN][BOARD_LEN]; // row by column
 
+
+  ChessBoard(){resetBoard();};  
   void submitMove(const char source[2], const char destination[2]); // make a move
   void resetBoard();   // resets Board to starting position
   void display_board() const;  // prints the board for debugging
