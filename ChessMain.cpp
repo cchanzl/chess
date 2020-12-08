@@ -11,9 +11,6 @@ int main() {
 
 	ChessBoard cb;
 	cout << '\n';
-
-	cb.display_board();
-
 	
 	cb.submitMove("D7", "D6");
 	cout << '\n';
@@ -22,30 +19,8 @@ int main() {
 	cout << '\n';
 
 	cb.submitMove("D2", "D4");
-	cout << '\n';
+	cout << '\n';	
 
-	cb.submitMove("B7", "B6"); // to be deleted
-	cout << '\n';
-	
-	cb.submitMove("E2", "E4"); // white. to be deleted
-	cout << '\n';
-
-	cb.submitMove("H7", "H5"); // to be deleted
-	cout << '\n';
-
-	cb.submitMove("F1", "B5"); // to be deleted
-	cout << '\n';
-	
-	cb.submitMove("H8", "H6"); // to be deleted
-	cout << '\n';
-
-	cb.submitMove("H2", "H3"); // to be deleted
-	cout << '\n';
-
-	cb.submitMove("D7", "D6"); // to be deleted
-	cout << '\n';
-	
-	/*
 	cb.submitMove("F8", "B4");
 	cout << '\n';
 
@@ -98,6 +73,6 @@ int main() {
 
 	cb.submitMove("D3", "G6");
 	cout << '\n';
-	*/
+	
 	return 0;
 }

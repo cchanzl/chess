@@ -16,11 +16,11 @@ class ChessBoard{
   bool turn = false; // white moves first
   /*  
   bool is_stale(); // returns true if it is a stalemate
-  bool is_check();  // returns true if check
   bool is_checkmate(); // returns true if checkmate
-  char* locate_queen(); // returns the position of the queen on board
   */
 
+  bool is_check(const bool colour);  // returns true if the "colour" is checked
+  void locate_king(const bool colour, char king[2]) const;
   bool is_self_check(const char source[2], const char destination[2]); // returns true if player self-checks    
   void change_turn();   // changes the turn
     

@@ -43,6 +43,52 @@ bool check_position(const char position[2]){
 
 //================= ChessBoard member Functions =====================
 
+void ChessBoard::locate_king(const bool colour, char king[2]) const{
+
+  int krow, kcol;
+  for ( int r = 0; r < BOARD_LEN; r++){
+    for ( int c = 0; c < BOARD_LEN; c++){
+
+      // continue if empty
+      if ( !board[r][c] ) continue;
+      // test if it is King
+      if ( board[r][c]->getLongName() == "King" && board[r][c]->getColour() == colour ){
+	krow = r;
+	kcol = c;
+	break;
+      }
+    }
+  }
+  king[0] = static_cast<char>(kcol + ASCII_OFFSET_A);
+  king[1] = static_cast<char>(krow + ASCII_OFFSET_0);
+}
+
+// returns true if it is check
+bool ChessBoard::is_check(const bool colour){
+  char king[2];
+  locate_king(colour, king);
+
+  // check for check
+  for ( int r = 0; r < BOARD_LEN; r++){
+    for ( int c = 0; c < BOARD_LEN; c++){
+
+      // continue if empty
+      if ( !board[r][c] ) continue;
+      
+      // Check if it is an opponent piece
+      if ( board[r][c]->getColour() == !colour ) {
+	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
+			  static_cast<char>(r + ASCII_OFFSET_0)};
+  
+	if ( board[r][c]->is_valid(*this, source, king) ){
+	  return true;
+	}
+      }
+    }
+  }
+  return false;
+}
+
 // returns true if a player self-checks after a move
 bool ChessBoard::is_self_check(const char source[2], const char destination[2]){
 
@@ -60,46 +106,14 @@ bool ChessBoard::is_self_check(const char source[2], const char destination[2]){
   board[drow][dcol] = board[srow][scol];
   board[srow][scol] = nullptr;
 
-  // locate king
-  int krow, kcol;
-
-  for ( int r = 0; r < BOARD_LEN; r++){
-    for ( int c = 0; c < BOARD_LEN; c++){
-
-      // continue if empty
-      if ( !board[r][c] ) continue;
-
-      if ( board[r][c]->getLongName() == "King" && board[r][c]->getColour() == turn ){
-	krow = r;
-	kcol = c;
-	break;
-      }
-    }
+  // check for self-check
+  if ( is_check(turn) ){
+    // revert board
+    board[srow][scol] = board[drow][dcol];
+    board[drow][dcol] = temp;
+    return true;	  
   }
-
-  char king[2] = {static_cast<char>(kcol + ASCII_OFFSET_A),
-		  static_cast<char>(krow + ASCII_OFFSET_0)};
-  
-  for ( int r = 0; r < BOARD_LEN; r++){
-    for ( int c = 0; c < BOARD_LEN; c++){
-
-      // continue if empty
-      if ( !board[r][c] ) continue;
-      
-      // Check if it is an opponent piece
-      if ( board[r][c]->getColour() == !turn ) {
-	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
-			  static_cast<char>(r + ASCII_OFFSET_0)};
-  
-	if ( board[r][c]->is_valid(*this, source, king) ){
-	  board[srow][scol] = board[drow][dcol];
-	  board[drow][dcol] = temp;
-	  return true;
-	}
-      }
-    }
-  }
-
+ 
   // revert board
   board[srow][scol] = board[drow][dcol];
   board[drow][dcol] = temp;
@@ -140,8 +154,10 @@ void ChessBoard::display_board() const{
 
 // initialise starting chess board
 void ChessBoard::resetBoard(){
-  std::cout << "A new chess game is started!\n" << std::endl;
+  std::cout << "A new chess game is started!" << std::endl;
 
+  turn = false;
+  
   for ( int row = 0; row < BOARD_LEN; row++){
     for ( int col = 0; col < BOARD_LEN; col++ ){
 
@@ -153,7 +169,7 @@ void ChessBoard::resetBoard(){
       if ( row > BOARD_LEN / 2 ) colour = true;
      
       // Initialise empty cells
-      if ( row  > 1 && row < 6 ) board[row][col] = NULL;
+      if ( row  > 1 && row < 6 ) board[row][col] = nullptr;
     
       // Initialise rook
       else if ( index == 0 || index == 7 || index == 56 || index == 63){ 
@@ -223,21 +239,27 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
  
     // eliminate opponent piece if present at destination
     if ( board[drow][dcol] ) {
-      std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName() << std::endl;
+      std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName();
       delete board[drow][dcol];
       board[drow][dcol] = nullptr;
     }
 
     // assign new move to destination
-    std::cout << std::endl;
     board[drow][dcol] = board[srow][scol];
     board[srow][scol] = nullptr;
+
+    // check if it is check
+    if ( is_check(!turn) ){
+      std::cout << std::endl;
+      std::cout << print_colour(!turn) << " is in check" << std::endl;
+    }
+    else std::cout << std::endl;
     
     // change turn
     change_turn();
 
     // print board after move
-    display_board();
+    //display_board();
   }
 
   // if it is not a valid move
