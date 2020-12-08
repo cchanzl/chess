@@ -18,11 +18,27 @@ std::string print_colour(bool colour){
   return name;
 }
 
-// returns an integer equal to the index in the chesspiece array
-int board_index(const char source[2]){
-  int col = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-  int row = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-  return row * BOARD_LEN + col;
+// returns true if positional input is appropriate
+bool check_position(const char position[2]){
+
+  if ( !isalpha(position[0]) || !isupper(position[0]) ){
+    std::cerr << position[0] << " is not a valid input character (input characters must be upper case letters A-H)!" << std::endl;
+    return false;
+  }
+
+  if ( !isdigit(position[1]) ) {
+    std::cerr << position[1] << " is not a valid input character (input characters must be numeric 0-7)!" << std::endl;
+    return false;
+  }
+
+  int col = static_cast<int>(position[0]) - ASCII_OFFSET_A;
+  int row = static_cast<int>(position[1]) - ASCII_OFFSET_0;
+
+  if ( row < 0 || row > 7 || col < 0 || col > 7 ) {
+    std::cerr << "Move " << position[0] << position [1] << " is not within board!" << std::endl;
+    return false;
+  }
+  return true;
 }
 
 //================= ChessBoard member Functions =====================
@@ -110,7 +126,7 @@ void ChessBoard::resetBoard(){
 void ChessBoard::submitMove(const char source[2], const char destination[2]){
 
   // check source and destination is in the right format
-  // ...
+  if ( !check_position(source) || !check_position(destination) ) return;
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
@@ -118,25 +134,51 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
   
-  // check if there is a piece at that position
+  // check if there is a piece at the starting position
   if( !board[srow][scol] ) {
     std::cout << "There is no piece at position " << source[0] << source [1]  << "!" << std::endl;
+    return;
   }
-  // check colour of piece and if it is the right turn
+  
+  // check colour of piece being moved if it is the right turn
   else if ( board[srow][scol]->getColour() != turn ) {
     std::cout << "It is not " << print_colour(!turn) << "'s turn to move!" << std::endl;
+    return;
   }
+  
   // check if destination is occupied by the same colour as start
   else if ( board[drow][dcol] && board[drow][dcol]->getColour() == board[srow][scol]->getColour() ){
     std::cout << print_colour(turn) << "'s " <<  board[drow][dcol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
   }
+
+  // check if it is a valid move
   else if ( board[srow][scol]->is_valid(*this, source, destination) ){
+
+    std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1];
+
+    // eliminate opponent piece if present at destination
+    if ( board[drow][dcol] ) {
+      std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName() << std::endl;
+      delete board[drow][dcol];
+      board[drow][dcol] = nullptr;
+    }
+
+    // assign new move to destination
+    std::cout << std::endl;
     board[drow][dcol] = board[srow][scol];
     board[srow][scol] = nullptr;
-    std::cout << print_colour(turn) <<"'s " << board[drow][dcol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1] << std::endl;
+    
+    // change turn
+    change_turn();
 
+    // print board after move
     display_board();
   }
+
+  // if it is not a valid move
+  else {
+    std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;   
+    return;
+  }
   
-  change_turn();
 }

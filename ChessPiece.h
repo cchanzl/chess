@@ -19,15 +19,17 @@ class ChessPiece {
 protected:
   std::string shortName;
   std::string longName;
-  bool status;       // true if alive
   bool colour;       // 1 if black and 0 if white
   int row;  // position of the chesspiece
   int col;  // position of the chesspiece
   
-  // generic move in desired direction and distance. up/down must be between 0 and 7
-  // returns true if move is possible
-  bool move_piece(const int up, const int down, const char source[2]);
-    
+  // make moves in desired direction and distance. up/down must be between 0 and 7
+  // returns true if move is within board
+  bool is_within_board(const int row, const int col, const char source[2]);
+
+  // makes diagonal moves
+  bool is_diag_valid(ChessBoard cb, const char source[2], const char destination[2]);
+  
 public:
   ChessPiece(){};
   ChessPiece(const std::string longName, const bool colour, int row, int col);
@@ -39,9 +41,10 @@ public:
   std::string getLongName(){return longName;};
   
   bool getColour(){return colour;};
-  void change_status();   // change status to 0 if captured
   bool is_alive();        // return status of ChessPiece
   //void update_position(const char dstination[2]);
+
+  virtual ~ChessPiece(){};
   
 };
 
@@ -54,7 +57,9 @@ public:
 
  // returns true if a move from source to destination is valid
   bool is_valid(ChessBoard cb, const char source[2], const char destination[2]); 
- 
+
+  ~King() override{};
+  
 };
 
 
@@ -66,7 +71,8 @@ public:
    // returns true if a move from source to destination is valid
   bool is_valid(ChessBoard cb,const char source[2], const char destination[2]); 
  
-
+  ~Rook() override{};
+  
 };
 
 
@@ -78,6 +84,7 @@ public:
  // returns true if a move from source to destination is valid
   bool is_valid(ChessBoard cb,const char source[2], const char destination[2]); 
  
+  ~Bishop() override{};
   
 };
 
@@ -90,7 +97,8 @@ public:
    // returns true if a move from source to destination is valid
   bool is_valid(ChessBoard cb,const char source[2], const char destination[2]); 
  
-
+  ~Queen() override{};
+  
 };
 
 
@@ -101,7 +109,8 @@ public:
 
   // returns true if a move from source to destination is valid
   bool is_valid(ChessBoard cb,const char source[2], const char destination[2]); 
- 
+
+  ~Knight() override{};
 
 };
 
@@ -114,7 +123,8 @@ public:
   // returns true if a move from source to destination is valid
   bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) override; 
  
-
+  ~Pawn() override{};
+  
 };
 
 #endif

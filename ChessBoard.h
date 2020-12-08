@@ -36,8 +36,8 @@ class ChessBoard{
 
 // ========== Generic Helper Functions ==========
 
-// returns an integer equal to the index in the chesspiece array
-int board_index(const char source[2]);
+// returns true if positional input is appropriate
+bool check_position(const char position[2]);
  
 
 
