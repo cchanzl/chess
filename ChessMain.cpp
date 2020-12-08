@@ -24,36 +24,26 @@ int main() {
 	cb.submitMove("D2", "D4");
 	cout << '\n';
 
-	cb.submitMove("D7", "D6"); // to be deleted
+	cb.submitMove("B7", "B6"); // to be deleted
 	cout << '\n';
 	
-	cb.submitMove("C1", "E3"); // white. to be deleted
+	cb.submitMove("E2", "E4"); // white. to be deleted
 	cout << '\n';
 
 	cb.submitMove("H7", "H5"); // to be deleted
 	cout << '\n';
 
-	cb.submitMove("H2", "H4"); // to be deleted
+	cb.submitMove("F1", "B5"); // to be deleted
 	cout << '\n';
 	
 	cb.submitMove("H8", "H6"); // to be deleted
 	cout << '\n';
 
-	cb.submitMove("H1", "H3"); // to be deleted
-	cout << '\n';
-	
-	cb.submitMove("H6", "F6"); // to be deleted
+	cb.submitMove("H2", "H3"); // to be deleted
 	cout << '\n';
 
-	cb.submitMove("H3", "F3"); // to be deleted
+	cb.submitMove("D7", "D6"); // to be deleted
 	cout << '\n';
-
-	cb.submitMove("F6", "F3"); // to be deleted
-	cout << '\n';
-
-	cb.submitMove("E1", "E2"); // to be deleted
-	cout << '\n';
-
 	
 	/*
 	cb.submitMove("F8", "B4");

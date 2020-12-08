@@ -19,10 +19,10 @@ class ChessBoard{
   bool is_check();  // returns true if check
   bool is_checkmate(); // returns true if checkmate
   char* locate_queen(); // returns the position of the queen on board
-  bool is_self_check(); // check if move leaves own King in check
-  */ 
-  
-  void change_turn();
+  */
+
+  bool is_self_check(const char source[2], const char destination[2]); // returns true if player self-checks    
+  void change_turn();   // changes the turn
     
  public:
   ChessPiece* board[BOARD_LEN][BOARD_LEN]; // row by column

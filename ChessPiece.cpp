@@ -198,7 +198,6 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
 
     // Condition 1: Move must be within the board
     if( !is_within_board(r_direction, c_direction, source) ) {
-      std::cout << "Not within board" << std::endl;
       continue;
     }
     
@@ -246,7 +245,6 @@ bool Knight::is_valid(ChessBoard cb, const char source[2], const char destinatio
 
     // Condition 1: Move must be within the board
     if( !is_within_board(r_direction, c_direction, source) ) {
-      std::cout << "Not within board" << std::endl;
       continue;
     }
     
