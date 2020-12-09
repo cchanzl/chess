@@ -14,11 +14,9 @@
 
 class ChessBoard{
   bool turn = false; // white moves first
-  /*  
-  bool is_stale(); // returns true if it is a stalemate
-  */
 
-  bool is_checkmate(const bool colour); // returns true if checkmate
+  bool is_stale(const bool colour); // returns true if "colour" has no possible moves
+  bool is_checkmate(const bool colour); // returns true if "colour" is checkmated
   bool is_check(const bool colour) const;  // returns true if the "colour" is checked
   void locate_king(const bool colour, char king[2]) const;
   bool is_self_check(const bool colour, const char source[2], const char destination[2]); // returns true if player self-checks    
@@ -32,6 +30,7 @@ class ChessBoard{
   void submitMove(const char source[2], const char destination[2]); // make a move
   void resetBoard();   // resets Board to starting position
   void display_board() const;  // prints the board for debugging
+
 };
 
 // ========== Generic Helper Functions ==========

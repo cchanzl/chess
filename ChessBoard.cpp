@@ -43,13 +43,43 @@ bool check_position(const char position[2]){
 
 //================= ChessBoard member Functions =====================
 
+// returns true if it is a stalemate
+bool ChessBoard::is_stale(const bool colour){
+
+  // returns false if there is a check
+  if ( is_check(colour) ) return false;
+
+  // check if "colour" can make any move without being checked
+  // Outer loop: Looks for chesspieces of the "colour" 
+  for ( int r = 0; r < BOARD_LEN; r++){
+    for ( int c = 0; c < BOARD_LEN; c++){
+
+      // if board is occupied and of the same colour
+      if ( board[r][c] && board[r][c]->getColour() == colour){
+	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
+			  static_cast<char>(r + ASCII_OFFSET_0)};
+  	
+	// Inner loop: If piece is found, make a move and see if it is valid  
+	for ( int x = 0; x < BOARD_LEN; x++){
+	  for ( int y = 0; y < BOARD_LEN; y++){
+
+	    char destination[2] = {static_cast<char>(y + ASCII_OFFSET_A),
+				   static_cast<char>(x + ASCII_OFFSET_0)};
+	    
+	    if ( board[x][y] && board[x][y]->getColour() == colour) continue;
+
+	    if ( board[r][c]->is_valid(*this, source, destination) && !is_self_check(colour, source, destination) ) return false;    
+	  }
+	}
+      }
+    }
+  }
+  return true;
+}
+
 // returns true if the "colour" is checkmated
 bool ChessBoard::is_checkmate(const bool colour){
 
-  // setup
-  char king[2];
-  locate_king(colour, king);
-  
   // returns false if there is not even a check
   if ( !is_check(colour) ) return false;	  
   
@@ -198,7 +228,8 @@ void ChessBoard::resetBoard(){
 
   // set to White's turn at every reset
   turn = false;
-  
+
+  // allocate cell by cell
   for ( int row = 0; row < BOARD_LEN; row++){
     for ( int col = 0; col < BOARD_LEN; col++ ){
 
@@ -256,60 +287,66 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
   
-  // check if there is a piece at the starting position
+  // Step 1: check if there is a piece at the starting position
   if( !board[srow][scol] ) {
     std::cout << "There is no piece at position " << source[0] << source [1]  << "!" << std::endl;
     return;
   }
   
-  // check colour of piece being moved, if it is on the right turn
+  // Step 2: check colour of piece being moved, if it is on the right turn
   else if ( board[srow][scol]->getColour() != turn ) {
     std::cout << "It is not " << print_colour(!turn) << "'s turn to move!" << std::endl;
     return;
   }
   
-  // check if destination is occupied by the same colour as start
+  // Step 3: check if destination is occupied by the same colour as start
   else if ( board[drow][dcol] && board[drow][dcol]->getColour() == board[srow][scol]->getColour() ){
     std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
   }
 
-  // check if it is a valid move and there is no self_check
+  // Step 4: check if it is a valid move and there is no self_check
   else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(turn, source, destination) ){
     
-    // output statement confirming move    
+    // Step 4.1: output statement confirming move    
     std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1];
  
-    // eliminate opponent piece if present at destination
+    // Step 4.2: eliminate opponent piece if present at destination
     if ( board[drow][dcol] ) {
       std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName();
       delete board[drow][dcol];
       board[drow][dcol] = nullptr;
     }
 
-    // assign new move to destination
+    // Step 4.3: assign new move to destination
     board[drow][dcol] = board[srow][scol];
     board[srow][scol] = nullptr;
 
-    // check if it is check
+    // Step 4.4a: check if it is check
     if ( is_check(!turn) ){
       std::cout << std::endl;
       std::cout << print_colour(!turn) << " is in check";
-      // check if it is checkmate
+      // Step 4.4b: check if it is checkmate
       if ( is_checkmate(!turn) ){
 	std::cout << "mate" << std::endl;
       }
       else std::cout << std::endl;
     }
-    else std::cout << std::endl;
+
+    // Step 4.5: if not a check or checkmate, check if it is stalemate in the next turn
+    else if ( is_stale(!turn) ){
+      std::cout << std::endl;
+      std::cout << print_colour(!turn) << " to move is a stalemated" << std::endl;;
+    }
+    else std::cout << std ::endl;
     
-    // change turn
+    // Step 4.6: change turn
     change_turn();
 
-    // print board after move
-    display_board();
+    // Step 4.7: (optional) print board after move
+    //display_board();
   }
 
-  // if it is not a valid move
+  // Step 5: if it is not a valid move
   else {
     std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;   
     return;
