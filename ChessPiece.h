@@ -17,23 +17,40 @@ class ChessBoard;
 // this is an abstract class
 class ChessPiece {
 protected:
-  std::string shortName;
-  std::string longName;
-  bool colour;       // 1 if black and 0 if white
-  int row;  // position of the chesspiece
-  int col;  // position of the chesspiece
+  std::string shortName; // short name of length 3 for printing to board on command line
+  std::string longName;  // full name of piece for cout messages
+  bool moved = false;    // true if a piece has moved. used for castling (Rook/King)
+  bool colour;           // 1 if black and 0 if white
+  int row;               // position of the chesspiece
+  int col;               // position of the chesspiece
+
+  // 4 combinations of {row, col} for multiple steps "+" shaped movement
+  int direction_line[4][2] = {{ 0, 1}, { 0,-1},
+			      { 1, 0}, {-1, 0}};  
+
+  // 4 combinations of {row, col} for single step "*" shaped movement
+  int direction_diag[4][2] = {{ 1, 1}, {-1, 1},
+			      { 1,-1}, {-1,-1}};
+
+  // 8 combinations of {row, col} for single step "*" shaped movement
+  int direction_star[8][2] = {{ 1, 0}, { 1, 1},
+			      { 1,-1}, { 0, 1},
+			      { 0,-1}, {-1,-1},
+			      {-1, 0}, {-1, 1}};
+
+  // 8 combinations of {row, col} for single step "L" shaped movement
+  int direction_L[8][2] = {{ 2, 1}, { 2,-1},
+			   { 1, 2}, { 1,-2},
+			   {-2, 1}, {-2,-1},
+			   {-1, 2}, {-1,-2}};
   
   // make moves in desired direction and distance. up/down must be between 0 and 7
   // returns true if move is within board
   bool is_within_board(const int row, const int col, const char source[2]);
 
-  // returns true if source can move to destination diagonally ("X")
-  // For Bishop and Queen
-  bool is_diag_valid(ChessBoard cb, const char source[2], const char destination[2]);
-
-  // returns true if source can move to destination linearly ("+")
-  // For Rook and Queen
-  bool is_line_valid(ChessBoard cb, const char source[2], const char destination[2]);
+  // returns true if source can move to destination diagonally and linearly ("X" & "+")
+  // For Rook, Bishop and Queen, depending on direction matrix provided
+  bool is_star_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[4][2]);
 
   // returns true if source can move one step in one of eight direction ("*")
   // For King and Knight, depending on direction matrix provided
@@ -45,13 +62,18 @@ public:
 
   // pure virtual function
   virtual bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) = 0;  
-  
-  std::string getShortName(){return shortName;};
-  std::string getLongName(){return longName;};
-  
-  bool getColour(){return colour;};
-  bool is_alive();        // return status of ChessPiece
-  //void update_position(const char dstination[2]);
+
+  // returns short name of piece for printing of ChessBoard to command line
+  std::string getShortName();
+
+  // returns long name of piece for printing of move to std::cout
+  std::string getLongName();
+
+  // set to true if piece has made a first successful move
+  void setFirstMove();
+
+  // returns colour of chess piece
+  bool getColour();
 
   virtual ~ChessPiece(){};
   

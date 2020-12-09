@@ -307,9 +307,10 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   // Step 4: check if it is a valid move and there is no self_check
   else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(turn, source, destination) ){
     
-    // Step 4.1: output statement confirming move    
+    // Step 4.1: output statement confirming move and set ChessPiece->moved to true    
     std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1];
- 
+    board[srow][scol]->setFirstMove();
+    
     // Step 4.2: eliminate opponent piece if present at destination
     if ( board[drow][dcol] ) {
       std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName();
@@ -343,7 +344,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    display_board();
+    // display_board();
   }
 
   // Step 5: if it is not a valid move
