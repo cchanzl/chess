@@ -43,6 +43,45 @@ bool check_position(const char position[2]){
 
 //================= ChessBoard member Functions =====================
 
+// returns true if the "colour" is checkmated
+bool ChessBoard::is_checkmate(const bool colour){
+
+  // setup
+  char king[2];
+  locate_king(colour, king);
+  
+  // returns false if there is not even a check
+  if ( !is_check(colour) ) return false;	  
+  
+  // check for checkmate
+  // Outer loop: Looks for chesspieces of the "colour" 
+  for ( int r = 0; r < BOARD_LEN; r++){
+    for ( int c = 0; c < BOARD_LEN; c++){
+
+      // if board is occupied and of the same colour
+      if ( board[r][c] && board[r][c]->getColour() == colour){
+	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
+			  static_cast<char>(r + ASCII_OFFSET_0)};
+  	
+	// Inner loop: If piece is found, make a move and see if it resolves the check  
+	for ( int x = 0; x < BOARD_LEN; x++){
+	  for ( int y = 0; y < BOARD_LEN; y++){
+
+	    char destination[2] = {static_cast<char>(y + ASCII_OFFSET_A),
+				   static_cast<char>(x + ASCII_OFFSET_0)};
+	    
+	    if ( board[x][y] && board[x][y]->getColour() == colour) continue;
+
+	    if ( board[r][c]->is_valid(*this, source, destination) && !is_self_check(colour, source, destination) ) return false;    
+	  }
+	}
+      }
+    }
+  }
+  return true;
+}
+
+// updates king [2] with the position of king of the specified colour
 void ChessBoard::locate_king(const bool colour, char king[2]) const{
 
   int krow, kcol;
@@ -63,12 +102,12 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
   king[1] = static_cast<char>(krow + ASCII_OFFSET_0);
 }
 
-// returns true if it is check
-bool ChessBoard::is_check(const bool colour){
+// returns true if the "colour" is checked
+bool ChessBoard::is_check(const bool colour) const{
   char king[2];
   locate_king(colour, king);
 
-  // check for check
+  // check for check by moving opponent piece to opposite King, cell by cell
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
 
@@ -90,7 +129,7 @@ bool ChessBoard::is_check(const bool colour){
 }
 
 // returns true if a player self-checks after a move
-bool ChessBoard::is_self_check(const char source[2], const char destination[2]){
+bool ChessBoard::is_self_check(const bool colour, const char source[2], const char destination[2]){
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
@@ -107,14 +146,14 @@ bool ChessBoard::is_self_check(const char source[2], const char destination[2]){
   board[srow][scol] = nullptr;
 
   // check for self-check
-  if ( is_check(turn) ){
-    // revert board
+  if ( is_check(colour) ){
+    // revert board once check is completed
     board[srow][scol] = board[drow][dcol];
     board[drow][dcol] = temp;
     return true;	  
   }
  
-  // revert board
+  // revert board once check is completed
   board[srow][scol] = board[drow][dcol];
   board[drow][dcol] = temp;
 	 
@@ -156,6 +195,7 @@ void ChessBoard::display_board() const{
 void ChessBoard::resetBoard(){
   std::cout << "A new chess game is started!" << std::endl;
 
+  // set to White's turn at every reset
   turn = false;
   
   for ( int row = 0; row < BOARD_LEN; row++){
@@ -203,6 +243,7 @@ void ChessBoard::resetBoard(){
   }
 }
 
+// submit move to the board
 void ChessBoard::submitMove(const char source[2], const char destination[2]){
 
   // check source and destination is in the right format
@@ -220,7 +261,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     return;
   }
   
-  // check colour of piece being moved if it is the right turn
+  // check colour of piece being moved, if it is on the right turn
   else if ( board[srow][scol]->getColour() != turn ) {
     std::cout << "It is not " << print_colour(!turn) << "'s turn to move!" << std::endl;
     return;
@@ -232,7 +273,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   }
 
   // check if it is a valid move and there is no self_check
-  else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(source, destination) ){
+  else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(turn, source, destination) ){
     
     // output statement confirming move    
     std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1];
@@ -251,7 +292,12 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     // check if it is check
     if ( is_check(!turn) ){
       std::cout << std::endl;
-      std::cout << print_colour(!turn) << " is in check" << std::endl;
+      std::cout << print_colour(!turn) << " is in check";
+      // check if it is checkmate
+      if ( is_checkmate(!turn) ){
+	std::cout << "mate" << std::endl;
+      }
+      else std::cout << std::endl;
     }
     else std::cout << std::endl;
     

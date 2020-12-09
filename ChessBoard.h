@@ -16,12 +16,12 @@ class ChessBoard{
   bool turn = false; // white moves first
   /*  
   bool is_stale(); // returns true if it is a stalemate
-  bool is_checkmate(); // returns true if checkmate
   */
 
-  bool is_check(const bool colour);  // returns true if the "colour" is checked
+  bool is_checkmate(const bool colour); // returns true if checkmate
+  bool is_check(const bool colour) const;  // returns true if the "colour" is checked
   void locate_king(const bool colour, char king[2]) const;
-  bool is_self_check(const char source[2], const char destination[2]); // returns true if player self-checks    
+  bool is_self_check(const bool colour, const char source[2], const char destination[2]); // returns true if player self-checks    
   void change_turn();   // changes the turn
     
  public:
