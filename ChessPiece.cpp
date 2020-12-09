@@ -153,6 +153,46 @@ bool ChessPiece::is_line_valid(ChessBoard cb, const char source[2], const char d
   return false;
 }
 
+bool ChessPiece::is_eight_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){
+
+  // obtain column and row
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
+
+  for ( int i = 0; i < BOARD_LEN; i++){  
+    // initialise direction
+    int r_direction = direction[i][0];
+    int c_direction = direction[i][1];
+
+    // Condition 1: Move must be within the board
+    if( !is_within_board(r_direction, c_direction, source) ) {
+      continue;
+    }
+    
+    // Condition 2: Check if there is a piece in destination
+    if ( cb.board[srow + r_direction][scol + c_direction] ){
+      // Condition 2.1: If a piece is in destination, it must not be same colour
+      if ( cb.board[srow + r_direction][scol + c_direction]->getColour() == colour) continue;
+      // Condition 2.2: If next piece is opposite colour, check if it is destination
+      if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+	row = drow;
+	col = dcol;
+	return true;
+      }
+    }
+
+    // Condition 3: Move must have the same position as destination after move
+    if ( srow + r_direction == drow && scol + c_direction == dcol ){    
+      row = drow;
+      col = dcol;
+      return true;
+    }
+  }
+  return false;
+  
+}
 
 //================= Member Functions of individual pieces =====================
 
@@ -178,12 +218,6 @@ bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destinatio
 
 // attempt to make a move from source to destination
 bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
- 
-  // obtain column and row
-  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
-  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
 
   // {row, col}
   int direction[8][2] = {{ 1, 0}, { 1, 1},
@@ -191,46 +225,11 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
 			 { 0,-1}, {-1,-1},
 			 {-1, 0}, {-1, 1}};
 
-  for ( int i = 0; i < BOARD_LEN; i++){  
-    // initialise direction
-    int r_direction = direction[i][0];
-    int c_direction = direction[i][1];
-
-    // Condition 1: Move must be within the board
-    if( !is_within_board(r_direction, c_direction, source) ) {
-      continue;
-    }
-    
-    // Condition 2: Check if there is a piece in destination
-    if ( cb.board[srow + r_direction][scol + c_direction] ){
-      // Condition 2.1: If a piece is in destination, it must not be same colour
-      if ( cb.board[srow + r_direction][scol + c_direction]->getColour() == colour) continue;
-      // Condition 2.2: If next piece is opposite colour, check if it is destination
-      if ( srow + r_direction == drow && scol + c_direction == dcol ){    
-	row = drow;
-	col = dcol;
-	return true;
-      }
-    }
-
-    // Condition 3: Move must have the same position as destination after move
-    if ( srow + r_direction == drow && scol + c_direction == dcol ){    
-      row = drow;
-      col = dcol;
-      return true;
-    }
-  }
-  return false;
+  return is_eight_valid(cb, source, destination, direction);
 }
 
 // attempt to make a move from source to destination
 bool Knight::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  
-  // obtain column and row
-  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
-  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0;
 
   // {row, col}
   int direction[8][2] = {{ 2, 1}, { 2,-1},
@@ -238,36 +237,7 @@ bool Knight::is_valid(ChessBoard cb, const char source[2], const char destinatio
 			 {-2, 1}, {-2,-1},
 			 {-1, 2}, {-1,-2}};
 
-  for ( int i = 0; i < BOARD_LEN; i++){  
-    // initialise direction
-    int r_direction = direction[i][0];
-    int c_direction = direction[i][1];
-
-    // Condition 1: Move must be within the board
-    if( !is_within_board(r_direction, c_direction, source) ) {
-      continue;
-    }
-    
-    // Condition 2: Check if there is a piece in destination
-    if ( cb.board[srow + r_direction][scol + c_direction] ){
-      // Condition 2.1: If a piece is in destination, it must not be same colour
-      if ( cb.board[srow + r_direction][scol + c_direction]->getColour() == colour) continue;
-      // Condition 2.2: If next piece is opposite colour, check if it is destination
-      if ( srow + r_direction == drow && scol + c_direction == dcol ){    
-	row = drow;
-	col = dcol;
-	return true;
-      }
-    }
-
-    // Condition 3: Move must have the same position as destination after move
-    if ( srow + r_direction == drow && scol + c_direction == dcol ){    
-      row = drow;
-      col = dcol;
-      return true;
-    }
-  }
-  return false;
+  return is_eight_valid(cb, source, destination, direction); 
 }
 
 

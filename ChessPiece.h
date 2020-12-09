@@ -28,11 +28,16 @@ protected:
   bool is_within_board(const int row, const int col, const char source[2]);
 
   // returns true if source can move to destination diagonally ("X")
+  // For Bishop and Queen
   bool is_diag_valid(ChessBoard cb, const char source[2], const char destination[2]);
 
   // returns true if source can move to destination linearly ("+")
+  // For Rook and Queen
   bool is_line_valid(ChessBoard cb, const char source[2], const char destination[2]);
 
+  // returns true if source can move one step in one of eight direction ("*")
+  // For King and Knight, depending on direction matrix provided
+  bool is_eight_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]);
   
 public:
   ChessPiece(){};
@@ -119,7 +124,7 @@ public:
 };
 
 
-class Pawn: public ChessPiece {
+class Pawn: public ChessPiece {  
 public:
   Pawn(const bool colour2, int row, int col)
     :ChessPiece("Pawn", colour2, row, col) {};

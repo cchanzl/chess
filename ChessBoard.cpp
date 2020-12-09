@@ -331,7 +331,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
       }
       else std::cout << std::endl;
     }
-
+    
     // Step 4.5: if not a check or checkmate, check if it is stalemate in the next turn
     else if ( is_stale(!turn) ){
       std::cout << std::endl;
@@ -343,7 +343,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    //display_board();
+    display_board();
   }
 
   // Step 5: if it is not a valid move

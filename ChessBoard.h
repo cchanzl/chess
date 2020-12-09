@@ -14,7 +14,7 @@
 
 class ChessBoard{
   bool turn = false; // white moves first
-
+ 
   bool is_stale(const bool colour); // returns true if "colour" has no possible moves
   bool is_checkmate(const bool colour); // returns true if "colour" is checkmated
   bool is_check(const bool colour) const;  // returns true if the "colour" is checked
@@ -30,7 +30,6 @@ class ChessBoard{
   void submitMove(const char source[2], const char destination[2]); // make a move
   void resetBoard();   // resets Board to starting position
   void display_board() const;  // prints the board for debugging
-
 };
 
 // ========== Generic Helper Functions ==========

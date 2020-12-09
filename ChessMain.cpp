@@ -77,14 +77,14 @@ int main() {
 	cout << '\n';
 
 	// Testing below. TO BE DELETED.
-	/*	
+		
 	cout << "=========================\n";
 	cout << "         TESTING         \n";
 	cout << "=========================\n\n";
-
+	
 	cb.resetBoard();
 	cout << '\n';
-	
+	/*
 	std::ifstream in("chessgame.txt");
 	std::string input;
 	int count = 1;
@@ -99,7 +99,7 @@ int main() {
 	  if ( count % 2 == 0 ) cout << '\n';
 	  count++;
 	  }
-	/*
+	*/
 	while (true){
 
 	  std::string sou, des;
@@ -113,7 +113,7 @@ int main() {
 
 	  cb.submitMove(source, destination);
 	  cout << '\n';
-	  }*/
+	  }
 
 	
 	return 0;
