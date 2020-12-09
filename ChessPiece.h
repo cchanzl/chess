@@ -72,6 +72,9 @@ public:
   // set to true if piece has made a first successful move
   void setFirstMove();
 
+  // get moved
+  bool getMoved(){return moved;};
+  
   // returns colour of chess piece
   bool getColour();
 

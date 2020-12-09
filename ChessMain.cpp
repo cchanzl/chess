@@ -84,8 +84,8 @@ int main() {
 	
 	cb.resetBoard();
 	cout << '\n';
-	/*
-	std::ifstream in("chessgame.txt");
+	
+	std::ifstream in("castling.txt");
 	std::string input;
 	int count = 1;
 	while (in >> input){
@@ -99,7 +99,7 @@ int main() {
 	  if ( count % 2 == 0 ) cout << '\n';
 	  count++;
 	  }
-	*/
+	/*
 	while (true){
 
 	  std::string sou, des;
@@ -114,7 +114,7 @@ int main() {
 	  cb.submitMove(source, destination);
 	  cout << '\n';
 	  }
-
+	*/
 	
 	return 0;
 }

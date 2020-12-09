@@ -183,7 +183,67 @@ bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destinatio
 
 // attempt to make a move from source to destination
 bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  return is_eight_valid(cb, source, destination, direction_star);
+  // check if it is a standard one cell move
+  if ( is_eight_valid(cb, source, destination, direction_star) ) return true;
+
+  //// check for castling move
+
+  // obtain column and row
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+  int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0; 
+  
+  // adjust offset to be +7 if black
+  int blk_offset = BOARD_LEN - 1;
+  (colour)? blk_offset = BOARD_LEN - 1 : blk_offset = 0;
+ 
+  // set king and rook initial positions {r , c}
+  int king[2] = {0 + blk_offset, BOARD_LEN/2 };
+  int rook[2][2] = {{0 + blk_offset, 0},               // queenside rook
+		    {0 + blk_offset, BOARD_LEN - 1}};  // kingside rook
+ 
+  // Condition 1: Source[2] is in King's original position and King must not have moved 
+  if ( srow != king[0] || scol != king[1] || moved != false ) return false;
+  
+  // Condition 2: Destination[2] must be 2 squares either queenside or kingside
+  if ( abs(dcol - scol) != 2 || drow != srow ) return false;
+
+  // Condition 3: There must be an unmoved Rook of the same colour on the castling side
+  int q_or_k = 1;  // 1 = castling kingside
+  (dcol - scol > 0)? q_or_k = 1 : q_or_k = 0;
+
+  int rookRow = rook[q_or_k][0];
+  int rookCol = rook[q_or_k][1];
+    
+  if ( cb.board[rookRow][rookCol]->getLongName() != "Rook" || cb.board[rookRow][rookCol]->getMoved() != false || cb.board[rookRow][rookCol]->getColour() != colour) return false;
+
+  // Condition 4: King is not currently in check
+  if ( cb.is_check(colour, source) ) return false;
+  
+  // Condition 5: No piece between Rook and King and King path not under attack
+  if ( q_or_k == 1) { // castling kingside
+    for ( int i = 1; i < rookCol - scol; i++){
+      // Condition 5.1a: There must not be any piece in between King and Rook
+      if ( cb.board[srow][scol+i] != nullptr ) return false;
+      // Condition 5.2b: Path of King must not be under attack
+      char path[2] = {static_cast<char>(srow),
+		      static_cast<char>(scol+i)};
+      if ( cb.is_check(colour, path) ) return false;
+    }
+  }
+  else { // castling queenside
+    for ( int i = 1; i < scol - rookCol; i++){
+      // Condition 5.1a: There must not be any piece in between King and Rook
+      if ( cb.board[srow][scol-i] != nullptr ) return false;
+      // Condition 5.2b: Path of King must not be under attack
+      if ( i == scol - rookCol ) break;
+      char path[2] = {static_cast<char>(srow),
+		      static_cast<char>(scol+i)};
+      if ( cb.is_check(colour, path) ) return false;
+    }
+  }
+  return true;
 }
 
 // attempt to make a move from source to destination
@@ -205,7 +265,8 @@ bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destin
   int vertDir = 1;
   (colour)? vertDir = -1 : vertDir = 1;
   
-  // allow for advancing two squares at the start if it is at start position
+  //// allow for advancing two squares at the start if it is at start position
+
   // Condition 1: Move must have the same position as destination after move
   if ( (srow + 2*vertDir) == drow && scol == dcol ){
     // Condition 2: White and Black Pawn must be in rows 1 and 6 respectively
@@ -219,7 +280,8 @@ bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destin
     }
   }
 
-  // allow for diagonal movement
+  //// allow for diagonal movement
+
   // Condition 1: Destination must be exactly 1 row and 1 col away from source
   if ( drow - srow == vertDir && abs(dcol - scol) == abs(vertDir) ) {
     // Condition 2: There must be opponent piece at destination
@@ -230,7 +292,8 @@ bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destin
     }
   }
 
-  // allow for advancement of one cell
+  //// allow for advancement of one cell
+
   // Condition 1: Move must have the same position as destination after move
   if ( srow + vertDir == drow && scol == dcol ){
     // Condition 2: No Opponent piece at destination

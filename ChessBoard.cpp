@@ -46,8 +46,11 @@ bool check_position(const char position[2]){
 // returns true if it is a stalemate
 bool ChessBoard::is_stale(const bool colour){
 
+  char king[2];
+  locate_king(colour, king);
+  
   // returns false if there is a check
-  if ( is_check(colour) ) return false;
+  if ( is_check(colour, king) ) return false;
 
   // check if "colour" can make any move without being checked
   // Outer loop: Looks for chesspieces of the "colour" 
@@ -81,7 +84,9 @@ bool ChessBoard::is_stale(const bool colour){
 bool ChessBoard::is_checkmate(const bool colour){
 
   // returns false if there is not even a check
-  if ( !is_check(colour) ) return false;	  
+  char king[2];
+  locate_king(colour, king);
+  if ( !is_check(colour, king) ) return false;	  
   
   // check for checkmate
   // Outer loop: Looks for chesspieces of the "colour" 
@@ -132,10 +137,8 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
   king[1] = static_cast<char>(krow + ASCII_OFFSET_0);
 }
 
-// returns true if the "colour" is checked
-bool ChessBoard::is_check(const bool colour) const{
-  char king[2];
-  locate_king(colour, king);
+// returns true if the "colour" is checked for that destination provided
+bool ChessBoard::is_check(const bool colour, const char destination[2]) const{
 
   // check for check by moving opponent piece to opposite King, cell by cell
   for ( int r = 0; r < BOARD_LEN; r++){
@@ -150,7 +153,7 @@ bool ChessBoard::is_check(const bool colour) const{
 			  static_cast<char>(r + ASCII_OFFSET_0)};
 
 	// returns true if any opponent piece can reach the king
-	if ( board[r][c]->is_valid(*this, source, king) ){
+	if ( board[r][c]->is_valid(*this, source, destination) ){
 	  return true;
 	}
       }
@@ -177,7 +180,9 @@ bool ChessBoard::is_self_check(const bool colour, const char source[2], const ch
   board[srow][scol] = nullptr;
 
   // check for self-check
-  if ( is_check(colour) ){
+  char king[2];
+  locate_king(colour, king);
+  if ( is_check(colour, king) ){
     // revert board once check is completed
     board[srow][scol] = board[drow][dcol];
     board[drow][dcol] = temp;
@@ -308,8 +313,16 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(turn, source, destination) ){
     
     // Step 4.1: output statement confirming move and set ChessPiece->moved to true    
-    std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from " << source[0] << source[1] << " to " << destination[0] << destination [1];
-    board[srow][scol]->setFirstMove();
+    if ( is_castling(source, destination) ){
+      int q_or_k = BOARD_LEN-1;  // BOARD_LEN = castling kingside
+      (dcol - scol > 0)? q_or_k = BOARD_LEN-1 : q_or_k = 0;
+      std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " castled from ";
+       board[srow][q_or_k]->setFirstMove(); // set rook moved to be true
+    }
+    else std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from ";
+
+    std::cout << source[0] << source[1] << " to " << destination[0] << destination [1];
+    board[srow][scol]->setFirstMove(); // set piece moved to be true   
     
     // Step 4.2: eliminate opponent piece if present at destination
     if ( board[drow][dcol] ) {
@@ -319,11 +332,25 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     }
 
     // Step 4.3: assign new move to destination
+    if ( is_castling(source, destination) ){
+      int q_or_k2 = -1;  // BOARD_LEN = castling kingside
+      (dcol - scol > 0)? q_or_k2 = -1 : q_or_k2 = 1;
+
+
+      int q_or_k = BOARD_LEN - 1;  // BOARD_LEN - 1 = castling kingside
+      (dcol - scol > 0)? q_or_k = BOARD_LEN - 1 : q_or_k = 0;
+      
+      board[srow][dcol + q_or_k2] = board[srow][q_or_k];
+      board[srow][q_or_k] = nullptr;
+    } 
     board[drow][dcol] = board[srow][scol];
     board[srow][scol] = nullptr;
 
     // Step 4.4a: check if it is check
-    if ( is_check(!turn) ){
+    char king[2];
+    locate_king(!turn, king);
+
+    if ( is_check(!turn, king) ){
       std::cout << std::endl;
       std::cout << print_colour(!turn) << " is in check";
       // Step 4.4b: check if it is checkmate
@@ -344,7 +371,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    // display_board();
+    display_board();
   }
 
   // Step 5: if it is not a valid move
