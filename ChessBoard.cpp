@@ -111,14 +111,15 @@ bool ChessBoard::is_check(const bool colour) const{
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
 
-      // continue if empty
+      // continue if empty / null
       if ( !board[r][c] ) continue;
       
       // Check if it is an opponent piece
       if ( board[r][c]->getColour() == !colour ) {
 	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
 			  static_cast<char>(r + ASCII_OFFSET_0)};
-  
+
+	// returns true if any opponent piece can reach the king
 	if ( board[r][c]->is_valid(*this, source, king) ){
 	  return true;
 	}
@@ -305,7 +306,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // print board after move
-    //display_board();
+    display_board();
   }
 
   // if it is not a valid move
