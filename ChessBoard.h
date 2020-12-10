@@ -51,24 +51,17 @@ class ChessBoard{
   void locate_king(const bool colour, char king[2]) const;
   bool is_self_check(const bool colour, const char source[2], const char destination[2]); // returns true if player self-checks    
   void change_turn();   // changes the turn
-  bool is_castling(const char source[2], const char destination[2]) const{
-    int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-    int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-    int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
-  
-    if ( board[srow][scol]->getLongName() == "King" && abs(dcol-scol) == 2 ) return true;
-    return false;
-  }; // returns true if king moved by two steps
+  bool is_castling(const char source[2], const char destination[2]) const; // returns true if king is castling. Can only be used to check valid moves.
   
  public:
   ChessPiece* board[BOARD_LEN][BOARD_LEN]; // row by column
 
-
-  ChessBoard(){resetBoard();};  
+  ChessBoard();  
   bool is_check(const bool colour, const char destination[2]) const;  // returns true if the "colour" is checked for that destination provided
   void submitMove(const char source[2], const char destination[2]); // make a move
   void resetBoard();   // resets Board to starting position
   void display_board() const;  // prints the board for debugging
+ 
 };
 
 // ========== Generic Helper Functions ==========

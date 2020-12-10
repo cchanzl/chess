@@ -2,15 +2,6 @@
 #include "ChessPiece.h"
 #include "ChessBoard.h"
 
-//================= Internal Helper Functions =====================
-
-
-
-
-
-
-
-
 //================= ChessPiece member Functions =====================
 
 // returns short name of piece for printing of ChessBoard to command line
@@ -23,6 +14,7 @@ std::string ChessPiece::getLongName(){
   return longName;
 }
 
+// set moved to true once the piece has made its first move. used for castling.
 void ChessPiece::setFirstMove(){
   moved = true;
 }
@@ -56,7 +48,7 @@ ChessPiece::ChessPiece(const std::string longName, const bool colour, int row, i
 
 }
 
-// generic move in desired direction and distance. up/down must be between 0 and 7  
+// generic move in desired direction and distance. row/col must be between 0 and 7  
 // returns true if move is within board
 bool ChessPiece::is_within_board(const int row, const int col, const char source[2]){
  
@@ -133,9 +125,7 @@ bool ChessPiece::is_eight_valid(ChessBoard cb, const char source[2], const char 
     int c_direction = direction[i][1];
 
     // Condition 1: Move must be within the board
-    if( !is_within_board(r_direction, c_direction, source) ) {
-      continue;
-    }
+    if( !is_within_board(r_direction, c_direction, source) ) continue;
     
     // Condition 2: Check if there is a piece in destination
     if ( cb.board[srow + r_direction][scol + c_direction] ){
@@ -183,7 +173,7 @@ bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destinatio
 
 // attempt to make a move from source to destination
 bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  // check if it is a standard one cell move
+  // check if it is a standard one cell move in one of eight directions
   if ( is_eight_valid(cb, source, destination, direction_star) ) return true;
 
   //// check for castling move
@@ -195,13 +185,11 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
   int drow = static_cast<int>(destination[1]) - ASCII_OFFSET_0; 
   
   // adjust offset to be +7 if black
-  int blk_offset = BOARD_LEN - 1;
-  (colour)? blk_offset = BOARD_LEN - 1 : blk_offset = 0;
+  int black_offset = BOARD_LEN - 1;
+  (colour)? black_offset = BOARD_LEN - 1 : black_offset = 0;
  
   // set king and rook initial positions {r , c}
-  int king[2] = {0 + blk_offset, BOARD_LEN/2 };
-  int rook[2][2] = {{0 + blk_offset, 0},               // queenside rook
-		    {0 + blk_offset, BOARD_LEN - 1}};  // kingside rook
+  int king[2] = {0 + black_offset, BOARD_LEN/2 };
  
   // Condition 1: Source[2] is in King's original position and King must not have moved 
   if ( srow != king[0] || scol != king[1] || moved != false ) return false;
@@ -210,11 +198,9 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
   if ( abs(dcol - scol) != 2 || drow != srow ) return false;
 
   // Condition 3: There must be an unmoved Rook of the same colour on the castling side
-  int q_or_k = 1;  // 1 = castling kingside
-  (dcol - scol > 0)? q_or_k = 1 : q_or_k = 0;
-
-  int rookRow = rook[q_or_k][0];
-  int rookCol = rook[q_or_k][1];
+  int rookRow = srow; 
+  int rookCol = BOARD_LEN - 1;  // castling kingside
+  (dcol - scol > 0)? rookCol = BOARD_LEN - 1 : rookCol = 0;
     
   if ( cb.board[rookRow][rookCol]->getLongName() != "Rook" || cb.board[rookRow][rookCol]->getMoved() != false || cb.board[rookRow][rookCol]->getColour() != colour) return false;
 
@@ -222,13 +208,13 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
   if ( cb.is_check(colour, source) ) return false;
   
   // Condition 5: No piece between Rook and King and King path not under attack
-  if ( q_or_k == 1) { // castling kingside
+  if ( rookCol == BOARD_LEN - 1) { // castling kingside
     for ( int i = 1; i < rookCol - scol; i++){
       // Condition 5.1a: There must not be any piece in between King and Rook
       if ( cb.board[srow][scol+i] != nullptr ) return false;
       // Condition 5.2b: Path of King must not be under attack
-      char path[2] = {static_cast<char>(srow),
-		      static_cast<char>(scol+i)};
+      char path[2] = {static_cast<char>(scol + ASCII_OFFSET_A + i), // col
+		      static_cast<char>(srow + ASCII_OFFSET_0)};    // row
       if ( cb.is_check(colour, path) ) return false;
     }
   }
@@ -237,9 +223,9 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
       // Condition 5.1a: There must not be any piece in between King and Rook
       if ( cb.board[srow][scol-i] != nullptr ) return false;
       // Condition 5.2b: Path of King must not be under attack
-      if ( i == scol - rookCol ) break;
-      char path[2] = {static_cast<char>(srow),
-		      static_cast<char>(scol+i)};
+      if ( i == scol - rookCol - 1 ) break; 
+      char path[2] = {static_cast<char>(scol + ASCII_OFFSET_A - i), // col
+		      static_cast<char>(srow + ASCII_OFFSET_0)};    // row
       if ( cb.is_check(colour, path) ) return false;
     }
   }
@@ -284,7 +270,7 @@ bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destin
 
   // Condition 1: Destination must be exactly 1 row and 1 col away from source
   if ( drow - srow == vertDir && abs(dcol - scol) == abs(vertDir) ) {
-    // Condition 2: There must be opponent piece at destination
+    // Condition 2: There must be an opponent piece at destination
     if ( cb.board[drow][dcol] ){
       row = drow;
       col = dcol;
@@ -297,6 +283,7 @@ bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destin
   // Condition 1: Move must have the same position as destination after move
   if ( srow + vertDir == drow && scol == dcol ){
     // Condition 2: No Opponent piece at destination
+    // Piece of same colour at destination was already checked
     if ( !cb.board[drow][dcol] ){
       row = drow;
       col = dcol;

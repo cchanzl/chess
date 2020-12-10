@@ -34,7 +34,7 @@ bool check_position(const char position[2]){
   int col = static_cast<int>(position[0]) - ASCII_OFFSET_A;
   int row = static_cast<int>(position[1]) - ASCII_OFFSET_0;
 
-  if ( row < 0 || row > 7 || col < 0 || col > 7 ) {
+  if ( row < 0 || row > BOARD_LEN - 1 || col < 0 || col > BOARD_LEN - 1 ) {
     std::cerr << "Move " << position[0] << position [1] << " is not within board!" << std::endl;
     return false;
   }
@@ -42,6 +42,17 @@ bool check_position(const char position[2]){
 }
 
 //================= ChessBoard member Functions =====================
+
+// returns true if king is castling. Can only be used to check valid moves.
+bool ChessBoard::is_castling(const char source[2], const char destination[2]) const{
+  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
+  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
+  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
+
+  // Condition 1: Piece moving is "King" and moves by 2 steps
+  if ( board[srow][scol]->getLongName() == "King" && abs(dcol-scol) == 2 ) return true;
+  return false;
+}; 
 
 // returns true if it is a stalemate
 bool ChessBoard::is_stale(const bool colour){
@@ -217,6 +228,7 @@ void ChessBoard::display_board() const{
 
       std::string name;
       if ( !board[row][col] ) name = "   ";
+      // prints 3 letter shortname for chessboard
       else name = board[row][col]->getShortName();
       std::cout << "|" << name;
     }
@@ -224,6 +236,16 @@ void ChessBoard::display_board() const{
   }
   print_frame();
   std::cout << std::endl;
+}
+
+// ChessBoard constructor
+ChessBoard::ChessBoard(){
+  for ( int row = 0; row < BOARD_LEN; row++){
+    for ( int col = 0; col < BOARD_LEN; col++ ){
+      board[row][col] = nullptr;
+    }
+  }
+  resetBoard();
 }
 
 
@@ -238,6 +260,9 @@ void ChessBoard::resetBoard(){
   for ( int row = 0; row < BOARD_LEN; row++){
     for ( int col = 0; col < BOARD_LEN; col++ ){
 
+      // deallocate previous memory in cell if not nullptr
+      if ( board[row][col] ) delete board[row][col]; 
+      
       // calculate index
       int index = row * BOARD_LEN + col;
       
@@ -295,13 +320,11 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   // Step 1: check if there is a piece at the starting position
   if( !board[srow][scol] ) {
     std::cout << "There is no piece at position " << source[0] << source [1]  << "!" << std::endl;
-    return;
   }
   
   // Step 2: check colour of piece being moved, if it is on the right turn
   else if ( board[srow][scol]->getColour() != turn ) {
     std::cout << "It is not " << print_colour(!turn) << "'s turn to move!" << std::endl;
-    return;
   }
   
   // Step 3: check if destination is occupied by the same colour as start
@@ -312,37 +335,36 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
   // Step 4: check if it is a valid move and there is no self_check
   else if ( board[srow][scol]->is_valid(*this, source, destination) && !is_self_check(turn, source, destination) ){
     
-    // Step 4.1: output statement confirming move and set ChessPiece->moved to true    
+    // Step 4.1: output statement confirming move     
+    std::cout << print_colour(turn) << "'s " << board[srow][scol]->getLongName();
     if ( is_castling(source, destination) ){
-      int q_or_k = BOARD_LEN-1;  // BOARD_LEN = castling kingside
-      (dcol - scol > 0)? q_or_k = BOARD_LEN-1 : q_or_k = 0;
-      std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " castled from ";
-       board[srow][q_or_k]->setFirstMove(); // set rook moved to be true
+      std::cout << " castled from ";
     }
-    else std::cout << print_colour(turn) <<"'s " << board[srow][scol]->getLongName() << " moves from ";
-
+    else std::cout << " moves from ";
     std::cout << source[0] << source[1] << " to " << destination[0] << destination [1];
-    board[srow][scol]->setFirstMove(); // set piece moved to be true   
     
     // Step 4.2: eliminate opponent piece if present at destination
     if ( board[drow][dcol] ) {
       std::cout << " taking " << print_colour(!turn) << "'s " << board[drow][dcol]->getLongName();
-      delete board[drow][dcol];
+      delete board[drow][dcol]; // deallocate memory
       board[drow][dcol] = nullptr;
     }
 
-    // Step 4.3: assign new move to destination
+    // Step 4.3: set firstMoved to true and assign new move to destination
     if ( is_castling(source, destination) ){
-      int q_or_k2 = -1;  // BOARD_LEN = castling kingside
+      int q_or_k2 = -1;  // -1 = castling kingside
       (dcol - scol > 0)? q_or_k2 = -1 : q_or_k2 = 1;
-
 
       int q_or_k = BOARD_LEN - 1;  // BOARD_LEN - 1 = castling kingside
       (dcol - scol > 0)? q_or_k = BOARD_LEN - 1 : q_or_k = 0;
+
+      board[srow][q_or_k]->setFirstMove(); // set rook moved to be true
       
-      board[srow][dcol + q_or_k2] = board[srow][q_or_k];
-      board[srow][q_or_k] = nullptr;
-    } 
+      board[srow][dcol + q_or_k2] = board[srow][q_or_k]; // move rook
+      board[srow][q_or_k] = nullptr; // set source as nullptr
+    }
+    
+    board[srow][scol]->setFirstMove(); // set piece moved to be true   
     board[drow][dcol] = board[srow][scol];
     board[srow][scol] = nullptr;
 
@@ -363,7 +385,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     // Step 4.5: if not a check or checkmate, check if it is stalemate in the next turn
     else if ( is_stale(!turn) ){
       std::cout << std::endl;
-      std::cout << print_colour(!turn) << " to move is a stalemated" << std::endl;;
+      std::cout << print_colour(!turn) << " to move is stalemated" << std::endl;;
     }
     else std::cout << std ::endl;
     
@@ -371,13 +393,11 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    display_board();
+    //display_board();
   }
 
   // Step 5: if it is not a valid move
   else {
     std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;   
-    return;
   }
-  
 }
