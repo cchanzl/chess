@@ -393,7 +393,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    //display_board();
+    // display_board();
   }
 
   // Step 5: if it is not a valid move

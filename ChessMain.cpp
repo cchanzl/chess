@@ -77,15 +77,15 @@ int main() {
 	cout << '\n';
 
 	// Testing below. TO BE DELETED.
-	/*		
+	/*
 	cout << "=========================\n";
 	cout << "         TESTING         \n";
 	cout << "=========================\n\n";
 	
 	cb.resetBoard();
 	cout << '\n';
-	
-	std::ifstream in("castleblock.txt");
+		
+	std::ifstream in("testing.txt");
 	std::string input;
 	int count = 1;
 	while (in >> input){
@@ -99,7 +99,7 @@ int main() {
 	  if ( count % 2 == 0 ) cout << '\n';
 	  count++;
 	  }
-	
+		
 	while (true){
 
 	  std::string sou, des;

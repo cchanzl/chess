@@ -4,6 +4,11 @@
 
 //================= ChessPiece member Functions =====================
 
+// returns the bool status as true if a piece has made its first move. false otherwise. 
+bool ChessPiece::getMoved(){
+  return moved;
+}
+
 // returns short name of piece for printing of ChessBoard to command line
 std::string ChessPiece::getShortName(){
   return shortName;
@@ -19,7 +24,7 @@ void ChessPiece::setFirstMove(){
   moved = true;
 }
 
-// returns colour of chess piece
+// returns colour of chess piece. true if white and false if black.
 bool ChessPiece::getColour(){
   return colour;
 }
