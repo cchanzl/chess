@@ -1,6 +1,6 @@
 #include <iostream>
+#include <memory>
 #include <cstring>
-
 #include "ChessBoard.h"
 
 
@@ -255,7 +255,7 @@ void ChessBoard::resetBoard(){
 
   // set to White's turn at every reset
   turn = false;
-
+ 
   // allocate cell by cell
   for ( int row = 0; row < BOARD_LEN; row++){
     for ( int col = 0; col < BOARD_LEN; col++ ){
@@ -393,11 +393,21 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     change_turn();
 
     // Step 4.7: (optional) print board after move
-    // display_board();
+    //display_board();
   }
 
   // Step 5: if it is not a valid move
   else {
     std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;   
   }
+}
+
+// destructor for ChessBoard to deallocate ChessPiece at end of main()
+ChessBoard::~ChessBoard(){
+  for ( int row = 0; row < BOARD_LEN; row++){
+    for ( int col = 0; col < BOARD_LEN; col++ ){
+      delete board[row][col];
+      board[row][col] = nullptr;
+    }
+  }  
 }

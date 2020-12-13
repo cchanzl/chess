@@ -40,6 +40,7 @@
 #define CHESSBOARD_H
 
 #include <iostream>
+#include <array>
 #include "constants.h"
 #include "ChessPiece.h"
 
@@ -48,20 +49,21 @@ class ChessBoard{
  
   bool is_stale(const bool colour); // returns true if "colour" has no possible moves
   bool is_checkmate(const bool colour); // returns true if "colour" is checkmated
-  void locate_king(const bool colour, char king[2]) const;
+  void locate_king(const bool colour, char king[2]) const; // updates king[2] with the cell location of King with the specified colour
   bool is_self_check(const bool colour, const char source[2], const char destination[2]); // returns true if player self-checks    
   void change_turn();   // changes the turn
   bool is_castling(const char source[2], const char destination[2]) const; // returns true if king is castling. Can only be used to check valid moves.
   
  public:
   ChessPiece* board[BOARD_LEN][BOARD_LEN]; // row by column
-
+  
   ChessBoard();  
   bool is_check(const bool colour, const char destination[2]) const;  // returns true if the "colour" is checked for that destination provided
   void submitMove(const char source[2], const char destination[2]); // make a move
   void resetBoard();   // resets Board to starting position
   void display_board() const;  // prints the board for debugging
- 
+  
+  ~ChessBoard(); // Destructor for ChessBoard to dealloate ChesSPiece at end of main()
 };
 
 // ========== Generic Helper Functions ==========

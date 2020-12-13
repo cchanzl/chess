@@ -75,8 +75,8 @@ int main() {
 
 	cb.submitMove("D3", "G6");
 	cout << '\n';
-
-	// Testing below. TO BE DELETED.
+	
+	// Testing below.
 	/*
 	cout << "=========================\n";
 	cout << "         TESTING         \n";
@@ -85,7 +85,7 @@ int main() {
 	cb.resetBoard();
 	cout << '\n';
 		
-	std::ifstream in("testing.txt");
+	std::ifstream in("ned.txt");
 	std::string input;
 	int count = 1;
 	while (in >> input){

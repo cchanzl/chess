@@ -50,18 +50,18 @@ protected:
 
   // returns true if source can move to destination diagonally and linearly ("X" or "+")
   // For Rook, Bishop and Queen, depending on direction matrix provided
-  bool is_star_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[4][2]);
+  bool is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[4][2]);
 
   // returns true if source can move one step in one of eight direction ("*" or "L")
   // For King and Knight, depending on direction matrix provided
-  bool is_eight_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]);
+  bool is_eight_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]);
   
 public:
   ChessPiece(){};
   ChessPiece(const std::string longName, const bool colour, int row, int col);
 
   // pure virtual function
-  virtual bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) = 0;  
+  virtual bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) = 0;  
 
   // returns short name of piece for printing of ChessBoard to command line
   std::string getShortName();
@@ -91,7 +91,7 @@ public:
     :ChessPiece("King", colour2, row, col) {};
 
  // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb, const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) override; 
 
   ~King() override{};
   
@@ -104,7 +104,7 @@ public:
     :ChessPiece("Rook", colour2, row, col) {};
 
    // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb,const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Rook() override{};
   
@@ -117,7 +117,7 @@ public:
     :ChessPiece("Bishop", colour2, row, col) {};
  
  // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb,const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Bishop() override{};
   
@@ -130,7 +130,7 @@ public:
     :ChessPiece("Queen", colour2, row, col) {};
 
    // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb,const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Queen() override{};
   
@@ -143,7 +143,7 @@ public:
     :ChessPiece("Knight", colour2, row, col) {};
 
   // returns true if a move from source to destination is valid
-  bool is_valid(ChessBoard cb,const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
 
   ~Knight() override{};
 
@@ -156,7 +156,7 @@ public:
     :ChessPiece("Pawn", colour2, row, col) {};
   
   // returns true if a move from source to destination is valid
-  bool is_valid(const ChessBoard cb, const char source[2], const char destination[2]) override; 
+  bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) override; 
  
   ~Pawn() override{};
   

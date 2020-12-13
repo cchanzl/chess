@@ -70,7 +70,7 @@ bool ChessPiece::is_within_board(const int row, const int col, const char source
 
 // returns true if source can move to destination diagonally and linearly ("X" & "+")
 // For Rook, Bishop and Queen, depending on direction matrix provided
-bool ChessPiece::is_star_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){;
+bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){;
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
@@ -81,7 +81,7 @@ bool ChessPiece::is_star_valid(ChessBoard cb, const char source[2], const char d
   int count = 0;
 
   // move one cell by one cell along 'X' or '+'
-  while ( count < 4 ){
+  while ( count < BOARD_LEN/2 ){
 
     int r_direction = direction[count][0];
     int c_direction = direction[count][1];
@@ -116,7 +116,7 @@ bool ChessPiece::is_star_valid(ChessBoard cb, const char source[2], const char d
   return false;
 }
 
-bool ChessPiece::is_eight_valid(ChessBoard cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){
+bool ChessPiece::is_eight_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
@@ -158,26 +158,27 @@ bool ChessPiece::is_eight_valid(ChessBoard cb, const char source[2], const char 
 //================= Member Functions of individual pieces =====================
 
 // attempt to make a move from source to destination
-bool Queen::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
-  // check if there is any valid diagonal("X") / linear("+") move
+bool Queen::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
+  // check if there is any valid diagonal("X") move
   if ( is_star_valid(cb, source, destination, direction_diag )) return true;
+  // check if there is any valid linear("+") move
   return is_star_valid(cb, source, destination, direction_line);
 }
 
 // attempt to make a move from source to destination
-bool Rook::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool Rook::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
   // check if there is any valid linear move ("+")
   return is_star_valid(cb, source, destination, direction_line);
 }
 
 // attempt to make a move from source to destination
-bool Bishop::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool Bishop::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
   // check if there is any valid diagonal move ("X")
   return is_star_valid(cb, source, destination, direction_diag);
 }
 
 // attempt to make a move from source to destination
-bool King::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool King::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
   // check if it is a standard one cell move in one of eight directions
   if ( is_eight_valid(cb, source, destination, direction_star) ) return true;
 
@@ -238,13 +239,13 @@ bool King::is_valid(ChessBoard cb, const char source[2], const char destination[
 }
 
 // attempt to make a move from source to destination
-bool Knight::is_valid(ChessBoard cb, const char source[2], const char destination[2]){
+bool Knight::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
   return is_eight_valid(cb, source, destination, direction_L); 
 }
 
 
 // attempt to make a move from source to destination
-bool Pawn::is_valid(const ChessBoard cb, const char source[2], const char destination[2]){
+bool Pawn::is_valid(const ChessBoard& cb, const char source[2], const char destination[2]){
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
