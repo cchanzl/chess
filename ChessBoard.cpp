@@ -44,11 +44,7 @@ bool check_position(const char position[2]){
 //================= ChessBoard member Functions =====================
 
 // returns true if king is castling. Can only be used to check valid moves.
-bool ChessBoard::is_castling(const char source[2], const char destination[2]) const{
-  int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
-  int srow = static_cast<int>(source[1]) - ASCII_OFFSET_0;
-  int dcol = static_cast<int>(destination[0]) - ASCII_OFFSET_A;
-
+bool ChessBoard::is_castling(const int scol, const int srow, const int dcol) const{
   // Condition 1: Piece moving is "King" and moves by 2 steps
   if ( board[srow][scol]->getLongName() == "King" && abs(dcol-scol) == 2 ) return true;
   return false;
@@ -337,7 +333,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     
     // Step 4.1: output statement confirming move     
     std::cout << print_colour(turn) << "'s " << board[srow][scol]->getLongName();
-    if ( is_castling(source, destination) ){
+    if ( is_castling(scol, srow, dcol) ){
       std::cout << " castled from ";
     }
     else std::cout << " moves from ";
@@ -351,7 +347,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     }
 
     // Step 4.3: set firstMoved to true and assign new move to destination
-    if ( is_castling(source, destination) ){
+    if ( is_castling(scol, srow, dcol) ){
       int q_or_k2 = -1;  // -1 = castling kingside
       (dcol - scol > 0)? q_or_k2 = -1 : q_or_k2 = 1;
 

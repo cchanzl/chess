@@ -85,7 +85,7 @@ int main() {
 	cb.resetBoard();
 	cout << '\n';
 		
-	std::ifstream in("ned.txt");
+	std::ifstream in("castleblock.txt");
 	std::string input;
 	int count = 1;
 	while (in >> input){
