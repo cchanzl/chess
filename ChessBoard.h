@@ -8,7 +8,7 @@
 /*****************************************************
      SAMPLE PRINT OUT OF CHESSBOARD (IF ENABLED)  
  
- NUMBERS IN A4 AND F4 SHOW REFERENCE BY AXIS [r][c]
+ NUMBERS IN A5 AND F4 SHOW REFERENCE BY AXIS [r][c]
  NUMBERS IN C4 AND E6 SHOW REFERENCE BY INDEX 0 to 63
 
  where  INDEX = ( r * 8 ) + c
@@ -40,12 +40,11 @@
 #define CHESSBOARD_H
 
 #include <iostream>
-#include <array>
 #include "constants.h"
 #include "ChessPiece.h"
 
 class ChessBoard{
-  bool turn = false; // white moves first
+  bool turn = false; // true if black and 0 if white. white moves first
  
   bool is_stale(const bool colour); // returns true if "colour" has no possible moves
   bool is_checkmate(const bool colour); // returns true if "colour" is checkmated

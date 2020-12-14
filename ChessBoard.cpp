@@ -130,7 +130,7 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
 
-      // continue if empty
+      // continue if the cell is empty
       if ( !board[r][c] ) continue;
       // test if it is King
       if ( board[r][c]->getLongName() == "King" && board[r][c]->getColour() == colour ){
@@ -140,6 +140,8 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
       }
     }
   }
+
+  // assign coordinate of King to King[2]
   king[0] = static_cast<char>(kcol + ASCII_OFFSET_A);
   king[1] = static_cast<char>(krow + ASCII_OFFSET_0);
 }
@@ -323,7 +325,7 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
     std::cout << "It is not " << print_colour(!turn) << "'s turn to move!" << std::endl;
   }
   
-  // Step 3: check if destination is occupied by the same colour as start
+  // Step 3: check if destination is occupied by the same colour as source piece
   else if ( board[drow][dcol] && board[drow][dcol]->getColour() == board[srow][scol]->getColour() ){
     std::cout << print_colour(turn) << "'s " <<  board[srow][scol]->getLongName() << " cannot move to " << destination[0] << destination [1]  << "!" << std::endl;
   }
@@ -348,23 +350,26 @@ void ChessBoard::submitMove(const char source[2], const char destination[2]){
 
     // Step 4.3: set firstMoved to true and assign new move to destination
     if ( is_castling(scol, srow, dcol) ){
-      int q_or_k2 = -1;  // -1 = castling kingside
-      (dcol - scol > 0)? q_or_k2 = -1 : q_or_k2 = 1;
+      int d_RookCol, s_RookCol;
+      if ( dcol - scol > 0 ){ // castling kingside
+	d_RookCol = dcol - 1;
+	s_RookCol = BOARD_LEN - 1;
+      }
+      else { // castling queenside
+	d_RookCol = dcol + 1;
+	s_RookCol = 0;
+      }
 
-      int q_or_k = BOARD_LEN - 1;  // BOARD_LEN - 1 = castling kingside
-      (dcol - scol > 0)? q_or_k = BOARD_LEN - 1 : q_or_k = 0;
-
-      board[srow][q_or_k]->setFirstMove(); // set rook moved to be true
-      
-      board[srow][dcol + q_or_k2] = board[srow][q_or_k]; // move rook
-      board[srow][q_or_k] = nullptr; // set source as nullptr
+      board[srow][s_RookCol]->setFirstMove(); // set rook moved to be true
+      board[srow][d_RookCol] = board[srow][s_RookCol]; // move rook
+      board[srow][s_RookCol] = nullptr; // set source as nullptr
     }
     
     board[srow][scol]->setFirstMove(); // set piece moved to be true   
-    board[drow][dcol] = board[srow][scol];
-    board[srow][scol] = nullptr;
+    board[drow][dcol] = board[srow][scol]; // move source piece to destination
+    board[srow][scol] = nullptr; // set source as nullptr
 
-    // Step 4.4a: check if it is check
+    // Step 4.4a: check if the opposite colour is in check
     char king[2];
     locate_king(!turn, king);
 

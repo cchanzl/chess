@@ -1,7 +1,6 @@
 #include "ChessBoard.h"
+
 #include <iostream>
-#include <cstring>
-#include <fstream>
 
 using std::cout;
 
@@ -75,45 +74,6 @@ int main() {
 
 	cb.submitMove("D3", "G6");
 	cout << '\n';
-	
-	// Testing below.
-	/*
-	cout << "=========================\n";
-	cout << "         TESTING         \n";
-	cout << "=========================\n\n";
-	
-	cb.resetBoard();
-	cout << '\n';
-		
-	std::ifstream in("castleblock.txt");
-	std::string input;
-	int count = 1;
-	while (in >> input){
-	  
-	  if( isdigit(input[0])) continue;
-	  
-	  char source[2] = {input[0], input[1]};
-	  char destination[2] = {toupper(input[2]), input[3]};
-
-	  cb.submitMove(source, destination);
-	  if ( count % 2 == 0 ) cout << '\n';
-	  count++;
-	  }
-		
-	while (true){
-
-	  std::string sou, des;
-	  std::cin >> sou >> des;
-	  
-	  char source[2];
-	  char destination[2];
-
-	  strcpy(source, sou.c_str());
-	  strcpy(destination, des.c_str());
-
-	  cb.submitMove(source, destination);
-	  cout << '\n';
-	  }*/
-		
+			
 	return 0;
 }

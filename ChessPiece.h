@@ -50,15 +50,15 @@ protected:
 
   // returns true if source can move to destination diagonally and linearly ("X" or "+")
   // For Rook, Bishop and Queen, depending on direction matrix provided
-  bool is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[4][2]);
+  bool is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN/2][2]);
 
-  // returns true if source can move one step in one of eight direction ("*" or "L")
+  // returns true if source can move one step in one of eight directions ("*" or "L")
   // For King and Knight, depending on direction matrix provided
   bool is_eight_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]);
   
 public:
   ChessPiece(){};
-  ChessPiece(const std::string longName, const bool colour, int row, int col);
+  ChessPiece(const std::string longName, const bool colour, const int row, const int col);
 
   // pure virtual function
   virtual bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) = 0;  
@@ -73,7 +73,7 @@ public:
   void setFirstMove();
 
   // returns the bool status as true if a piece has made its first move. false otherwise.
-  bool getMoved();
+  bool getMoved() const;
   
   // returns colour of chess piece. true if white and false if black. 
   bool getColour();
@@ -94,7 +94,6 @@ public:
   bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) override; 
 
   ~King() override{};
-  
 };
 
 
@@ -107,7 +106,6 @@ public:
   bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Rook() override{};
-  
 };
 
 
@@ -120,7 +118,6 @@ public:
   bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Bishop() override{};
-  
 };
 
 
@@ -133,7 +130,6 @@ public:
   bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
  
   ~Queen() override{};
-  
 };
 
 
@@ -146,7 +142,6 @@ public:
   bool is_valid(const ChessBoard& cb,const char source[2], const char destination[2]) override; 
 
   ~Knight() override{};
-
 };
 
 
@@ -159,7 +154,6 @@ public:
   bool is_valid(const ChessBoard& cb, const char source[2], const char destination[2]) override; 
  
   ~Pawn() override{};
-  
 };
 
 #endif

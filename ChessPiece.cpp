@@ -5,7 +5,7 @@
 //================= ChessPiece member Functions =====================
 
 // returns the bool status as true if a piece has made its first move. false otherwise. 
-bool ChessPiece::getMoved(){
+bool ChessPiece::getMoved() const{
   return moved;
 }
 
@@ -30,13 +30,13 @@ bool ChessPiece::getColour(){
 }
 
 // ChessPiece constructor
-ChessPiece::ChessPiece(const std::string longName, const bool colour, int row, int col)
+ChessPiece::ChessPiece(const std::string longName, const bool colour, const int row, const int col)
   : longName(longName), colour(colour), row(row), col(col){
 
   // calculate index on board
   int index = row * BOARD_LEN + col;
   
-  // set name
+  // set colour
   std::string name = "w";
   if ( colour == true ) name = "b";
 
@@ -46,11 +46,11 @@ ChessPiece::ChessPiece(const std::string longName, const bool colour, int row, i
     
   // set piece number for printing to command line
   if ( longName == "Queen" || longName == "King" ) name.push_back('1');
-  else if ( longName == "Pawn") name.push_back( ((index % 8) + 1) + '0' );
+  else if ( longName == "Pawn") name.push_back( ((index % 8)) + ASCII_OFFSET_0 );
   else name.push_back((index % 2)? '2' : '1');
-    
-  shortName = name;
 
+  // initialise 3 letter shortName
+  shortName = name;
 }
 
 // generic move in desired direction and distance. row/col must be between 0 and 7  
@@ -70,7 +70,7 @@ bool ChessPiece::is_within_board(const int row, const int col, const char source
 
 // returns true if source can move to destination diagonally and linearly ("X" & "+")
 // For Rook, Bishop and Queen, depending on direction matrix provided
-bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){;
+bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN/2][2]){;
 
   // obtain column and row
   int scol = static_cast<int>(source[0]) - ASCII_OFFSET_A;
@@ -82,7 +82,7 @@ bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const
 
   // move one cell by one cell along 'X' or '+'
   while ( count < BOARD_LEN/2 ){
-
+    // initialise direction
     int r_direction = direction[count][0];
     int c_direction = direction[count][1];
     
@@ -101,6 +101,7 @@ bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const
 	  col = dcol;
 	  return true;
 	}
+	// next piece is opposite colour but not destination, break to next direction
 	break;
       }
     
@@ -116,6 +117,8 @@ bool ChessPiece::is_star_valid(const ChessBoard& cb, const char source[2], const
   return false;
 }
 
+// returns true if source can move one step in one of eight directions ("*" or "L")
+// For King and Knight, depending on direction matrix provided
 bool ChessPiece::is_eight_valid(const ChessBoard& cb, const char source[2], const char destination[2], const int direction[BOARD_LEN][2]){
 
   // obtain column and row
@@ -142,6 +145,8 @@ bool ChessPiece::is_eight_valid(const ChessBoard& cb, const char source[2], cons
 	col = dcol;
 	return true;
       }
+      // next piece is oppostie colour but not destination, continue to next move
+      continue;
     }
 
     // Condition 3: Move must have the same position as destination after move
