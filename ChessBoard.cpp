@@ -96,7 +96,7 @@ bool ChessBoard::is_checkmate(const bool colour){
   if ( !is_check(colour, king) ) return false;	  
   
   // check for checkmate
-  // Outer loop: Looks for chesspieces of the "colour" 
+  // Outer loop: Look for chesspieces of the "colour" 
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
 
@@ -129,7 +129,6 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
   int krow, kcol;
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
-
       // continue if the cell is empty
       if ( !board[r][c] ) continue;
       // test if it is King
@@ -146,10 +145,10 @@ void ChessBoard::locate_king(const bool colour, char king[2]) const{
   king[1] = static_cast<char>(krow + ASCII_OFFSET_0);
 }
 
-// returns true if the "colour" is checked for that destination provided
+// returns true if the "colour" is checked for the destination that king is in
 bool ChessBoard::is_check(const bool colour, const char destination[2]) const{
 
-  // check for check by moving opponent piece to opposite King, cell by cell
+  // check for check by moving opponent piece to destination, cell by cell
   for ( int r = 0; r < BOARD_LEN; r++){
     for ( int c = 0; c < BOARD_LEN; c++){
 
@@ -160,8 +159,8 @@ bool ChessBoard::is_check(const bool colour, const char destination[2]) const{
       if ( board[r][c]->getColour() == !colour ) {
 	char source[2] = {static_cast<char>(c + ASCII_OFFSET_A),
 			  static_cast<char>(r + ASCII_OFFSET_0)};
-
-	// returns true if any opponent piece can reach the king
+	// returns true if any opponent piece can reach the destination
+	// does not need to check for self_check, since this function always moves to king position
 	if ( board[r][c]->is_valid(*this, source, destination) ){
 	  return true;
 	}
